@@ -1,0 +1,29 @@
+* {
+    font-family: 'Lobster', cursive;
+    /*padding: 64px;*/
+}
+
+html, body {
+    height: 100vh;
+}
+
+.linethrough {
+    text-decoration: line-through;
+}
+
+#wrap {
+    min-height: 100vh;
+}
+
+#main {
+    overflow:auto;
+    padding-bottom:220px; /* this needs to be bigger than footer height*/
+}
+
+.footer {
+    position: relative;
+    margin-top: -150px; /* negative value of footer height */
+    height: 150px;
+    clear:both;
+    padding-top:20px;
+}
