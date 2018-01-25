@@ -1,8 +1,43 @@
 * {
     margin: 8px;
     padding: 8px;
+    font-family: 'Lobster', cursive;
+    color: blue;
 }
 
 body {
     background-color: pink;
+}
+
+#haters:hover {
+    font-size: 3em;
+    background-color: aqua;
+    font-weight: 1000;
+}
+
+.my_button:hover {
+    display: none;
+}
+
+.hero {
+    background-color: brown;
+    width: 100vw;
+    height: 800px;
+    background-image: ("https://www.goodgameall.com/data/articles/402joe-danger.jpg");
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.tile {
+    height: 50px;
+    width: 44px;
+}
+
+.tile:hover {
+    height: 1px;
+    width: 1px;
 }
