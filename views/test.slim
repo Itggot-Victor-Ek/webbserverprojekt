@@ -1,5 +1,6 @@
 a href="#{@authorization.data}" xml file
 p "#{@authorization.data[0]}"
 p "#{@authorization.data[1]}" <- Time when theos bus leaves
+br
 
-p token: "#{@authorization.token}"
+  ==recaptcha_tag(:challenge)
