@@ -42,6 +42,8 @@ GEM
     rack (2.0.3)
     rack-protection (2.0.0)
       rack
+    rack-recaptcha (0.6.6)
+      json
     rb-fsevent (0.10.2)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
@@ -73,6 +75,7 @@ DEPENDENCIES
   httparty
   json
   oauth2
+  rack-recaptcha
   rerun!
   sinatra
   slim
