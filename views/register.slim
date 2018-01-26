@@ -1,0 +1,27 @@
+
+form action='/register' method='post'
+
+  div.form-group
+    label.text-white for='name' Name
+    input.form-control type='text' name='name' id='name' placeholder='Name'
+
+  div.form-group
+    label.text-white for='username' Username
+    input.form-control type='text' name='username' id='username' placeholder='Username'
+    - if session[:invalidUsername]
+      small.form-text.text-danger You entered a invalid username, please try again.
+
+  div.form-group
+    label.text-white for='email' Email
+    input.form-control type='email' name='email' id='email' placeholder='example.name@example.com'
+    - if session[:invalidMail]
+      small.form-text.text-danger You entered a invalid Email, please try again.
+
+  div.form-group
+    label.text-white for='password' Password
+    input.form-control type='password' name='password' id='password' placeholder='**********'
+    small.form-text.text-muted Your password needs at least 7 Characters (Not really but let's pretend)
+    -if session[:invalidPassword]
+      small.form-text.text-danger You entered a invalid password, please try again.
+
+  button.btn.btn-primary type='submit' Submit
