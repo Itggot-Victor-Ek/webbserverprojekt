@@ -3,6 +3,7 @@ require 'bundler'
 require "net/http"
 require "uri"
 require 'base64'
+require 'json'
 
 #Load gems from Gemfile
 Bundler.require
@@ -10,6 +11,7 @@ Bundler.require
 #Load the app
 require_relative 'main'
 require_relative 'models/authorization'
+require_relative 'models/users'
 
 #Load models
 #require_relative 'models/xxx'
