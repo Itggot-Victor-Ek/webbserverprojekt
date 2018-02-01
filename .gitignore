@@ -50,3 +50,6 @@ build-iPhoneSimulator/
 
 # unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
 .rvmrc
+.vagrant/machines/default/virtualbox/vagrant_cwd
+.vagrant/machines/default/virtualbox/id
+.vagrant/machines/default/virtualbox/action_provision
