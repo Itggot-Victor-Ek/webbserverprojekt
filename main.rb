@@ -6,6 +6,7 @@ class Main < Sinatra::Base
 
   get '/' do
     @authorization = Authorization.new
+    session[:token] = @authorization.token
     slim :test
   end
 
@@ -25,8 +26,19 @@ class Main < Sinatra::Base
   end
 
   get '/user/:username' do
-
+    @routes = Routes.get_route_for_user(session[:username])
     slim :user
+  end
+
+  get '/reseplanerare' do
+    @user = session[:username]
+    @stations = StationHandler.getAllStations
+    slim :reseplanerare
+  end
+
+  post '/reseplanerare' do
+    Routes.add_route_for_user(session[:username], session[:token], params[:start_station], params[:stop_station])
+
   end
 
   get '/theo' do
