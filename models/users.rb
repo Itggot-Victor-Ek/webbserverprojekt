@@ -1,6 +1,6 @@
 class User
   attr_reader :name, :username, :mail, :redirectURL
-  def initialize(name, username, mail)
+  def initialize(name, username, mail, session)
     @register_error = "/register"
     @name = name
     @username = username
@@ -9,6 +9,7 @@ class User
       @redirectURL = "#{@register_error}"
     else
       @redirectURL = "/user/#{@username}"
+      session[:username] = @username
     end
   end
 
@@ -16,12 +17,12 @@ class User
     db = SQLite3::Database.open('db/Västtrafik.sqlite')
 
     if !self.valid_password(password, session) || !self.valid_username(username, db, session)|| !self.valid_mail(mail, db, session)
-      return self.new("error", "/register", "error")
+      return self.new("error",'/register',"error", session)
     end
 
     hashed_password = BCrypt::Password.create(password)
     db.execute('INSERT INTO users (name,username,mail,password) VALUES (?,?,?,?)', [name,username,mail,hashed_password])
-    return self.new(name,username,mail)
+    return self.new(name, username, mail, session)
 
   end
 

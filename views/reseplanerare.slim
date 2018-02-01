@@ -1,0 +1,23 @@
+form action='' method='post'
+
+  .input-group.mb-3
+    .input-group-prepend
+      span.input-group-text id="span"Start station
+    input.form-control id="start_station" name="start_station" list="start_stations" placeholder="Start Station" aria-describedby="span"
+
+    .input-group-prepend
+      span.input-group-text id="span2"Stop station
+    input.form-control id="stop_station" name="stop_station" list="stop_stations" placeholder="Stop Station" aria-describedby="span2"
+
+  datalist id="start_stations"
+
+  datalist id="stop_stations"
+
+  template id="resultstemplate"
+    -@stations.each do |station|
+      option value="#{station[0]}" =station[0]
+
+
+  button.btn.btn-primary type='submit' Submit
+
+script src="/js/limit_results.js"
