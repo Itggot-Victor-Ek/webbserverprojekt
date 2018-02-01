@@ -10,13 +10,12 @@ Bundler.require
 
 #Load the app
 require_relative 'main'
-require_relative 'models/authorization'
-require_relative 'models/users'
 
 #Load models
-#require_relative 'models/xxx'
-
-
+require_relative 'models/authorization'
+require_relative 'models/users'
+require_relative 'models/stationHandler'
+require_relative 'models/routes'
 #Make Slim NICE!
 Slim::Engine.set_options pretty: true, sort_attrs: false
 
