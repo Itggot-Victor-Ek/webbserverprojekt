@@ -8,6 +8,8 @@ form action='' method='post'
     .input-group-prepend
       span.input-group-text id="span2"Stop station
     input.form-control id="stop_station" name="stop_station" list="stop_stations" placeholder="Stop Station" aria-describedby="span2"
+  -if session[:bad_route]
+    small.form-text.text-danger =session[:bad_route_messege]
 
   datalist id="start_stations"
 

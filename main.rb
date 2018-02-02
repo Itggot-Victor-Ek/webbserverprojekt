@@ -37,8 +37,15 @@ class Main < Sinatra::Base
   end
 
   post '/reseplanerare' do
-    Routes.add_route_for_user(session[:username], session[:token], params[:start_station], params[:stop_station])
+    route_redirect = Routes.add_route_for_user(session[:username], session[:token], params[:start_station], params[:stop_station], session) #gör till objekt
+    redirect "#{route_redirect}"
+  end
 
+  get '/token' do
+    @authorization = Authorization.new
+    session[:token] = @authorization.token
+    session[:username] = "test"
+    redirect '/user/test'
   end
 
   get '/theo' do

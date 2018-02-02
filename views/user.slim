@@ -1,4 +1,15 @@
 a.m-5 href="/reseplanerare" Reseplanerare
+a.m-5 href="/token" Get Token
 
--@routes.each do |route|
-  p =route
+table.table
+  thead.thead-light
+    tr
+      th scope="col" #
+      th scope="col" Avgångstid
+      th scope="col" Namn
+  tbody
+    -@routes.each_with_index do |route, i|
+      tr
+        th scope="row" =i+1
+        td =route[1]
+        td =route[2]
