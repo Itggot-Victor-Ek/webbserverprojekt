@@ -30,6 +30,15 @@ class Main < Sinatra::Base
     slim :user
   end
 
+  get '/login' do
+    slim :login
+  end
+
+  post '/login' do
+    user = User.login(params['name'], params['password'], session)
+    redirect user.redirectURL
+  end
+
   get '/reseplanerare' do
     @user = session[:username]
     @stations = StationHandler.getAllStations
