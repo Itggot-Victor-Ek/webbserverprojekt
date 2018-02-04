@@ -28,17 +28,27 @@ class Routes
       session[:bad_route_messege] = JSON.parse(json_body)['DepartureBoard']["errorText"]
       return '/reseplanerare'
     end
-    
+
     db = SQLite3::Database.open('db/Västtrafik.sqlite')
     stop_id = db.execute('SELECT id FROM all_stops WHERE stop_name IS ?', [station_name])[0]
+    i = 0
     JSON.parse(json_body)['DepartureBoard']['Departure'].each do |hash|
-      db.execute('INSERT INTO departure (time, busid, stopid, input_date) VALUES(?, ?, ?, ?)', [hash["time"], hash["name"], stop_id, date])
+      if i < 5
+        db.execute('INSERT INTO departure(time, busid, stopid, input_date) VALUES(?, ?, ?, ?) WHERE NOT EXISTS(SELECT 1 FROM departure WHERE time IS ? AND busid IS ? AND stopid IS ?)', [hash["time"], hash["name"], stop_id, date, hash["time"], hash["name"], stop_id])
+      end
+      i += 1
     end
     session[:bad_route] = false
     return '/user/test'
   end
 
   def self.get_route_for_user(username)
+    db = SQLite3::Database.open('db/Västtrafik.sqlite')
+    remove_old_routes(username)
+    return db.execute('SELECT * FROM departure')
+  end
+
+  def self.remove_old_routes(username)
     db = SQLite3::Database.open('db/Västtrafik.sqlite')
     elements = db.execute('SELECT * FROM departure')      #nytt namn på varibeln
     elements.each do |array|
@@ -50,6 +60,5 @@ class Routes
         db.execute('DELETE FROM departure WHERE id IS ?', [array[0]])
       end
     end
-    return db.execute('SELECT * FROM departure')
   end
 end
