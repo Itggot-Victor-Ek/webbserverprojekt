@@ -46,6 +46,7 @@ class Main < Sinatra::Base
     session[:token] = @authorization.token
     session[:username] = "test"
     redirect '/user/test'
+    slim :progressbar
   end
 
   get '/theo' do
