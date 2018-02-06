@@ -19,6 +19,7 @@ class Routes
     hour = Time.now.strftime('%H')
     minutes = Time.now.strftime('%M')
     date = Time.now.strftime('%Y-%m-%d')
+    date2 = Time.now.strftime('%Y-%m-%d-%H:%M')
 
     url = "https://api.vasttrafik.se/bin/rest.exe/v2/departureBoard?id=#{start_station_id}&date=2018-01-25&time=#{hour}%3A#{minutes}&direction=#{stop_station_id}&format=json"
     json_body = HTTParty.get(url, headers: api_auth_header).body
@@ -28,17 +29,37 @@ class Routes
       session[:bad_route_messege] = JSON.parse(json_body)['DepartureBoard']["errorText"]
       return '/reseplanerare'
     end
-    
+
     db = SQLite3::Database.open('db/Västtrafik.sqlite')
-    stop_id = db.execute('SELECT id FROM all_stops WHERE stop_name IS ?', [station_name])[0]
+    stopid = db.execute('SELECT id FROM all_stops WHERE stop_name IS ?', [station_name])[0]
+    userid = db.execute('SELECT id FROM users WHERE username IS ?', [username])[0]
+    i = 0
     JSON.parse(json_body)['DepartureBoard']['Departure'].each do |hash|
-      db.execute('INSERT INTO departure (time, busid, stopid, input_date) VALUES(?, ?, ?, ?)', [hash["time"], hash["name"], stop_id, date])
+      if i < 5
+        db.execute('INSERT INTO buses (name, input_date) VALUES (?,?)', [hash['name'], date2])
+        busid = db.execute('SELECT id FROM buses WHERE name IS ? AND input_date IS ?', [hash['name'], date])[0]
+        db.execute('INSERT INTO user_stop_relation (accountid, busid, stopid, input_date) VALUES (?,?,?,?)', [userid, busid, stopid, date])
+        db.execute('INSERT INTO departure(time, busid, stopid, input_date) VALUES(?,?,?,?)', [hash["time"], busid, stopid, date])
+      end
+      i += 1
     end
     session[:bad_route] = false
     return '/user/test'
   end
 
   def self.get_route_for_user(username)
+    db = SQLite3::Database.open('db/Västtrafik.sqlite')
+    remove_old_routes(username)
+    date = Time.now.strftime('%Y-%m-%d')
+    accountid = db.execute('SELECT id FROM users WHERE username IS ?', [username])
+    arr = []
+    arr << db.execute('SELECT time FROM departure WHERE busid IN (SELECT id FROM buses WHERE id IN (SELECT busid FROM user_stop_relation WHERE accountid IS (SELECT id FROM users WHERE username IS ?)))', [username])
+    arr << db.execute('SELECT name FROM buses WHERE id IN (SELECT busid FROM user_stop_relation WHERE accountid IS (SELECT id FROM users WHERE username IS ?))', [username])
+    #result = db.execute('SELECT * FROM departure WHERE stopid IN (SELECT stopid FROM user_stop_relation WHERE accountid IS ? AND input_date > ?)',[accountid, date])
+    pp arr
+  end
+
+  def self.remove_old_routes(username)
     db = SQLite3::Database.open('db/Västtrafik.sqlite')
     elements = db.execute('SELECT * FROM departure')      #nytt namn på varibeln
     elements.each do |array|
@@ -50,6 +71,5 @@ class Routes
         db.execute('DELETE FROM departure WHERE id IS ?', [array[0]])
       end
     end
-    return db.execute('SELECT * FROM departure')
   end
 end

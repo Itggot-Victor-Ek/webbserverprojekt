@@ -11,5 +11,5 @@ table.table
     -@routes.each_with_index do |route, i|
       tr
         th scope="row" =i+1
-        td =route[1]
-        td =route[2]
+        td =route[0][0]
+        td =route[0][1]

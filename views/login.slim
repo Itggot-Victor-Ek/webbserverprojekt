@@ -1,0 +1,12 @@
+form action='/login' method='post'
+  .form-group
+    label.text-white for='name' Username
+    input.form-control type='text' name='name' id='name' placeholder='Username or email'
+
+  .form-group
+    label.text-white for='password' Password
+    input.form-control type='password' name='password' id='password' placeholder='**********'
+    -if session[:invalidPassword]
+      small.form-text.text-danger You entered a invalid password, please try again.
+
+  button.btn.btn-primary type='submit' Submit
