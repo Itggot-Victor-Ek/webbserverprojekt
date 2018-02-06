@@ -53,3 +53,4 @@ build-iPhoneSimulator/
 .vagrant/machines/default/virtualbox/vagrant_cwd
 .vagrant/machines/default/virtualbox/id
 .vagrant/machines/default/virtualbox/action_provision
+db/Västtrafik.sqlite
