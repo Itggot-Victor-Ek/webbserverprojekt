@@ -31,7 +31,6 @@ class Routes
     end
 
     db = SQLite3::Database.open('db/Västtrafik.sqlite')
-<<<<<<< HEAD
     stopid = db.execute('SELECT id FROM all_stops WHERE stop_name IS ?', [station_name])[0]
     userid = db.execute('SELECT id FROM users WHERE username IS ?', [username])[0]
     i = 0
@@ -41,13 +40,11 @@ class Routes
         busid = db.execute('SELECT id FROM buses WHERE name IS ? AND input_date IS ?', [hash['name'], date])[0]
         db.execute('INSERT INTO user_stop_relation (accountid, busid, stopid, input_date) VALUES (?,?,?,?)', [userid, busid, stopid, date])
         db.execute('INSERT INTO departure(time, busid, stopid, input_date) VALUES(?,?,?,?)', [hash["time"], busid, stopid, date])
-=======
     stop_id = db.execute('SELECT id FROM all_stops WHERE stop_name IS ?', [station_name])[0]
     i = 0
     JSON.parse(json_body)['DepartureBoard']['Departure'].each do |hash|
       if i < 5
         db.execute('INSERT INTO departure(time, busid, stopid, input_date) VALUES(?, ?, ?, ?) WHERE NOT EXISTS(SELECT 1 FROM departure WHERE time IS ? AND busid IS ? AND stopid IS ?)', [hash["time"], hash["name"], stop_id, date, hash["time"], hash["name"], stop_id])
->>>>>>> 621be7109bd0b2a4d6dbab8372e590d698580093
       end
       i += 1
     end
@@ -58,7 +55,6 @@ class Routes
   def self.get_route_for_user(username)
     db = SQLite3::Database.open('db/Västtrafik.sqlite')
     remove_old_routes(username)
-<<<<<<< HEAD
     date = Time.now.strftime('%Y-%m-%d')
     accountid = db.execute('SELECT id FROM users WHERE username IS ?', [username])
     arr = []
@@ -66,9 +62,7 @@ class Routes
     arr << db.execute('SELECT name FROM buses WHERE id IN (SELECT busid FROM user_stop_relation WHERE accountid IS (SELECT id FROM users WHERE username IS ?))', [username])
     #result = db.execute('SELECT * FROM departure WHERE stopid IN (SELECT stopid FROM user_stop_relation WHERE accountid IS ? AND input_date > ?)',[accountid, date])
     pp arr
-=======
     return db.execute('SELECT * FROM departure')
->>>>>>> 621be7109bd0b2a4d6dbab8372e590d698580093
   end
 
   def self.remove_old_routes(username)
