@@ -8,8 +8,12 @@ table.table
       th scope="col" Avgångstid
       th scope="col" Namn
   tbody
+    -puts "#{@routes}routessss"
     -@routes.each_with_index do |route, i|
-      tr
-        th scope="row" =i+1
-        td =route[0][0]
-        td =route[0][1]
+      -puts "#{route} Route"
+      -route.each do |info|
+        -puts "#{info} info"
+        tr
+          th scope="row" =i+1
+          td =info[0]
+          td =info[0]

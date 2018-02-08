@@ -37,16 +37,14 @@ class Routes
     JSON.parse(json_body)['DepartureBoard']['Departure'].each do |hash|
       if i < 5
         db.execute('INSERT INTO buses (name, input_date) VALUES (?,?)', [hash['name'], date2])
-        busid = db.execute('SELECT id FROM buses WHERE name IS ? AND input_date IS ?', [hash['name'], date])[0]
-        db.execute('INSERT INTO user_stop_relation (accountid, busid, stopid, input_date) VALUES (?,?,?,?)', [userid, busid, stopid, date])
-        db.execute('INSERT INTO departure(time, busid, stopid, input_date) VALUES(?,?,?,?)', [hash["time"], busid, stopid, date])
-    stop_id = db.execute('SELECT id FROM all_stops WHERE stop_name IS ?', [station_name])[0]
-    i = 0
-    JSON.parse(json_body)['DepartureBoard']['Departure'].each do |hash|
-      if i < 5
-        db.execute('INSERT INTO departure(time, busid, stopid, input_date) VALUES(?, ?, ?, ?) WHERE NOT EXISTS(SELECT 1 FROM departure WHERE time IS ? AND busid IS ? AND stopid IS ?)', [hash["time"], hash["name"], stop_id, date, hash["time"], hash["name"], stop_id])
+        db.execute('INSERT INTO departure(time, busid, stopid, input_date) VALUES(?,?,?,?)', [hash["time"], "delete_column?", stopid, date])
+
+        busid = db.execute('SELECT id FROM buses WHERE name IS ? AND input_date > (SELECT input_date|| " " || time FROM departure WHERE )', [hash['name']])[0]
+        p busid
+        db.execute('INSERT INTO user_stop_relation (accountid, busid, stopid, input_date) VALUES (?,?,?,?)', [userid, busid, stopid, date2])
+
+        i += 1
       end
-      i += 1
     end
     session[:bad_route] = false
     return '/user/test'
@@ -55,14 +53,14 @@ class Routes
   def self.get_route_for_user(username)
     db = SQLite3::Database.open('db/Västtrafik.sqlite')
     remove_old_routes(username)
-    date = Time.now.strftime('%Y-%m-%d')
+    date = Time.now.strftime('%Y-%m-%d-%H:%M')
     accountid = db.execute('SELECT id FROM users WHERE username IS ?', [username])
     arr = []
     arr << db.execute('SELECT time FROM departure WHERE busid IN (SELECT id FROM buses WHERE id IN (SELECT busid FROM user_stop_relation WHERE accountid IS (SELECT id FROM users WHERE username IS ?)))', [username])
-    arr << db.execute('SELECT name FROM buses WHERE id IN (SELECT busid FROM user_stop_relation WHERE accountid IS (SELECT id FROM users WHERE username IS ?))', [username])
+    arr << db.execute('SELECT name FROM buses WHERE id IN (SELECT busid FROM user_stop_relation WHERE accountid IS (SELECT id FROM users WHERE username IS ?) AND input_date > ?)', [username, date])
     #result = db.execute('SELECT * FROM departure WHERE stopid IN (SELECT stopid FROM user_stop_relation WHERE accountid IS ? AND input_date > ?)',[accountid, date])
     pp arr
-    return db.execute('SELECT * FROM departure')
+    return arr
   end
 
   def self.remove_old_routes(username)
