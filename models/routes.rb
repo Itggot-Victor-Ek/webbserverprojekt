@@ -4,9 +4,8 @@
 # require 'json'
 # require 'pp'
 class Route
-
     def self.add_for_user(_username, bearer_token, start_station, stop_station, _session)
-        @db = SQLite3::Database.open('../db/Västtrafik.sqlite')
+        @db = SQLite3::Database.open('db/Västtrafik.sqlite')
 
         # Set the token and encode the strings
         bearer_token = bearer_token
@@ -14,36 +13,44 @@ class Route
         start_station = URI.encode(start_station)
         stop_station = URI.encode(stop_station)
 
-        #getting the start station id
+        # getting the start station id
         url = "https://api.vasttrafik.se/bin/rest.exe/v2/location.name?input=#{start_station}&format=json"
         json_body = HTTParty.get(url, headers: api_auth_header).body
         start_station = JSON.parse(json_body)['LocationList']['StopLocation'][0]
         start_station_id = start_station['id']
 
-        #getting the stop station id
+        # getting the stop station id
         url = "https://api.vasttrafik.se/bin/rest.exe/v2/location.name?input=#{stop_station}&format=json"
         json_body = HTTParty.get(url, headers: api_auth_header).body
         stop_station = JSON.parse(json_body)['LocationList']['StopLocation'][0]
         stop_station_id = stop_station['id']
 
-        #requst the route from the desired start and stop station
+        # requst the route from the desired start and stop station
         url = "https://api.vasttrafik.se/bin/rest.exe/v2/trip?originId=#{start_station_id}&destId=#{stop_station_id}&format=json"
         json_body = HTTParty.get(url, headers: api_auth_header).body
         @legs = [JSON.parse(json_body)['TripList']['Trip']][0]
-        #starting loop to store the relevant data
+        # starting loop to store the relevant data
         @legs.each do |leg|
+            @leg_id = @db.execute('SELECT id FROM departure where id = (select max(id) from departure)')
+
+            if @leg_id.empty?
+                @leg_id = 1
+            else
+                @leg_id = @leg_id[0][0].to_i + 1
+            end
+
             leg.each do |data|
                 Route.input_data(data, _username)
             end
-            #set connection_id back to nil when the route has ended
+            # set connection_id back to nil when the route has ended
             @connection_id = nil
         end
     end
 
     def self.input_data(data, _username)
-        if !(data == ['valid', 'false'] || data == ['alternative', 'true'])
+        unless data == ["valid", "false"] || data == ["alternative", "true"]
             data[1].each_with_index do |item, i|
-                #Fetch all relevant data from the JSON body
+                # Fetch all relevant data from the JSON body
                 vehicle_type =      item.fetch('name', nil)
                 type =              item.fetch('type', nil)
                 direction =         item.fetch('direction', nil)
@@ -56,29 +63,30 @@ class Route
                 destination_time =  item.fetch('Destination', nil).fetch('time',  nil)
                 destination_date =  item.fetch('Destination', nil).fetch('date',  nil)
 
-                #Input all data into the database
-                origin_id = @db.execute('SELECT id FROM all_stops WHERE stop_name IS ?', [origin_name])
-                destination_id = @db.execute('SELECT id FROM all_stops WHERE stop_name IS ?', [destination_name])
+                # Input all data into the database
+                #origin_id = @db.execute('SELECT id FROM all_stops WHERE stop_name IS ?', [origin_name])
+                #destination_id = @db.execute('SELECT id FROM all_stops WHERE stop_name IS ?', [destination_name])
                 @db.execute('INSERT INTO departure (vehicle_type, type, direction, origin_name_id,
                     origin_time, origin_date, origin_track, destination_name_id,
-                    destination_time, destination_date, destination_track, connection_id)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',[vehicle_type, type, direction,
-                    origin_id, origin_time, origin_date, origin_track, destination_id,
-                    destination_time, destination_date, destination_track, @connection_id])
-                #Get the last id to be able to reference the full route
-                @connection_id = @db.execute('SELECT last_insert_rowid()') unless destination_name == nil
+                    destination_time, destination_date, destination_track, connection_id, parent_id)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)', [vehicle_type, type, direction,
+                                                        origin_name, origin_time, origin_date, origin_track, destination_name,
+                                                        destination_time, destination_date, destination_track, @connection_id, @leg_id])
+                # Get the last id to be able to reference the full route
+                @connection_id = @db.execute('SELECT last_insert_rowid()') unless destination_name.nil?
 
-                #if it's the starting station make a relation between the user and route
+                # if it's the starting station make a relation between the user and route
                 if i == 0
                     user_id = @db.execute('SELECT id FROM users WHERE username IS ?', [_username])
-                    @db.execute('INSERT INTO user_departure_relation (user_id, departure_id) VALUES(?,?)',[user_id, @connection_id])
+                    @db.execute('INSERT INTO user_departure_relation (user_id, departure_id) VALUES(?,?)', [user_id, @connection_id])
                 end
             end
         end
     end
 
     def self.for_user(username)
-        
+        db = SQLite3::Database.open('db/Västtrafik.sqlite')
+        return db.execute('SELECT * FROM departure WHERE parent_id IN (SELECT departure_id FROM user_departure_relation WHERE user_id IN (SELECT id FROM users WHERE username IS ?))', [username])
     end
 
     def self.remove_old_routes(username); end
