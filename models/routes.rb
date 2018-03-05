@@ -89,21 +89,19 @@ class Route
         return db.execute('SELECT * FROM departure WHERE parent_id IN (SELECT departure_id FROM user_departure_relation WHERE user_id IN (SELECT id FROM users WHERE username IS ?))', [username])
     end
 
-    def self.remove_old_routes(username); end
-end
+    def self.remove_old_routes(username)
+        db = SQLite3::Database.open('db/Västtrafik.sqlite')
+        departures = db.execute('SELECT * FROM departure')
+        departures.each do |departure|
+          dates = departure[6].split("-")
+          minutes = departure[5][3..-1]
+          hours = departure[5]
+          date = Time.new(dates[0], dates[1], dates[2], hours, minutes)
 
-# consumer_key = 'VXiGD3igELfzYAQkVoJaKJXZewAa'
-# consumer_secret = 'N_51VglCPlf91Oj403HHkhsNUQYa'
-#
-# credentials = Base64.encode64("#{consumer_key}:#{consumer_secret}").delete("\n")
-# url = 'https://api.vasttrafik.se:443/token'
-# body = 'grant_type=client_credentials&scope=<device_12345>'
-# headers = {
-#     'Authorization' => "Basic #{credentials}",
-#     'Content-Type' => 'application/x-www-form-urlencoded;charset=UTF-8'
-# }
-# r = HTTParty.post(url, body: body, headers: headers)
-# bearer_token = JSON.parse(r.body)['access_token']
-# @token = bearer_token
-#
-# Route.add_for_user('t', bearer_token, "n\xC3\xB6dinge", "holmv\xC3\xA4gen", {})
+          if Time.new() > date
+            db.execute('DELETE FROM departure WHERE parent_id IS ?', [departure[0]])
+            db.execute('DELETE FROM user_departure_relation WHERE departure_id IS ?', [departure[0]])
+          end
+        end
+    end
+end

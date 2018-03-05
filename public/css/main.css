@@ -1,3 +1,11 @@
+* {
+    margin-left: 32px;
+    padding-bottom: 53px;
+    transition: 1s ease;
+}
+/* by The O */
+
+
 body {
   display: flex;
   align-items: center;
@@ -40,4 +48,8 @@ body {
 
 .color-green{
     background-color: lawnGreen;
+}
+
+.margin-top-table{
+    margin-top: 100px;
 }

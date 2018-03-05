@@ -23,6 +23,7 @@ class Main < Sinatra::Base
     end
 
     get '/user/:username' do
+        Route.remove_old_routes(session[:username])
         @routes = Route.for_user(session[:username])
         slim :user
     end
