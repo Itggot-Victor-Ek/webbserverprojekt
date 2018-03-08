@@ -12,11 +12,22 @@ form action='/reseplanerare' method='post'
         -if session[:bad_route]
             small.form-text.text-danger =session[:bad_route_messege]
 
-        .container.mt-3
-            .row
-                .col-sm-6.mx-auto
-                    .form-group
-                        #timepicker.input-group.date
+        .container.d-flex.justify-content-center
+            div style="overflow:hidden;"
+                .form-group
+                    .row style="width: 700px; display: flex; justify-content: space-around;"
+                        .col-md-8.mr-5.ml-5
+                            #datetimepicker data-target-input="nearest"
+                                input.hidden-input data-target="#datetimepicker" id="date_and_time" name="date_and_time" type="text"
+                javascript:
+                    $(function () {
+                        $('#datetimepicker').datetimepicker({
+                            inline: true,
+                            sideBySide: true,
+                            format: 'YYYY-M-d HH:mm',
+                            use24hours: true
+                        });
+                    });
 
 
 
@@ -31,6 +42,6 @@ form action='/reseplanerare' method='post'
 
 
         button.btn.btn-primary type='submit' Submit
-            
+
 
 script src="/js/limit_results.js"

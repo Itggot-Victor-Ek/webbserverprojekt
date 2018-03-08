@@ -4,8 +4,12 @@
 # require 'json'
 # require 'pp'
 class Route
-    def self.add_for_user(_username, bearer_token, start_station, stop_station, _session)
+    def self.add_for_user(_username, bearer_token, start_station, stop_station, date_and_time, _session)
         @db = SQLite3::Database.open('db/Västtrafik.sqlite')
+
+        date = date_and_time.split(" ")[0]
+        hours = date_and_time[-5..-4]
+        minutes = date_and_time[-2..-1]
 
         # Set the token and encode the strings
         bearer_token = bearer_token
@@ -26,18 +30,19 @@ class Route
         stop_station_id = stop_station['id']
 
         # requst the route from the desired start and stop station
-        url = "https://api.vasttrafik.se/bin/rest.exe/v2/trip?originId=#{start_station_id}&destId=#{stop_station_id}&format=json"
+        url = "https://api.vasttrafik.se/bin/rest.exe/v2/trip?originId=#{start_station_id}&destId=#{stop_station_id}&date=#{date}&time=#{hours}%3A#{minutes}&format=json"
         json_body = HTTParty.get(url, headers: api_auth_header).body
-        @legs = [JSON.parse(json_body)['TripList']['Trip']][0]
+        legs = [JSON.parse(json_body)['TripList']['Trip']][0]
         # starting loop to store the relevant data
-        @legs.each do |leg|
-            @leg_id = @db.execute('SELECT id FROM departure where id = (select max(id) from departure)')
+        legs.each do |leg|
+            @leg_id = @db.execute('SELECT id FROM departure where id = (SELECT max(id) FROM departure)')
 
             if @leg_id.empty?
                 @leg_id = 1
             else
                 @leg_id = @leg_id[0][0].to_i + 1
             end
+            pp leg
 
             leg.each do |data|
                 Route.input_data(data, _username)
@@ -95,7 +100,7 @@ class Route
         departures.each do |departure|
           dates = departure[6].split("-")
           minutes = departure[5][3..-1]
-          hours = departure[5]
+          hours = departure[5][0..1]
           date = Time.new(dates[0], dates[1], dates[2], hours, minutes)
 
           if Time.new() > date

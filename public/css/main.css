@@ -1,7 +1,4 @@
 * {
-    margin-left: 32px;
-    padding-bottom: 53px;
-    transition: 1s ease;
 }
 /* by The O */
 
@@ -43,13 +40,17 @@ body {
 }
 
 .color-pink{
-    background-color: hotpink;
+    background-color: #393336;
 }
 
 .color-green{
-    background-color: lawnGreen;
+    background-color: #222;
 }
 
 .margin-top-table{
     margin-top: 100px;
+}
+
+.hidden-input{
+    display: none;
 }
