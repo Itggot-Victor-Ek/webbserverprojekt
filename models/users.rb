@@ -29,29 +29,28 @@ class User
     end
 
     def self.valid_password(password, session, login)
+
         if login[0]
             db = SQLite3::Database.open('db/Västtrafik.sqlite')
             dbpassword = db.execute('SELECT password FROM users WHERE username IS ?', [login[1]])
             decrypted_password = BCrypt::Password.new(dbpassword[0][0])
             if decrypted_password == password
                 session[:invalidPassword] = false
+                session[:logged_in] = true
                 return true
             end
             session[:invalidPassword] = true
+            session[:logged_in] = false
             return false
         end
 
-        if password.empty?
+        if password.empty? || password.include?(' ')
             session[:invalidPassword] = true
+            session[:logged_in] = false
             return false
         end
-
-        if password.include?(' ')
-            session[:invalidPassword] = true
-            return false
-        end
-
         session[:invalidPassword] = false
+        session[:logged_in] = true
         true
     end
 
@@ -62,26 +61,31 @@ class User
             usernames.each do |name|
                 if name.first == username
                     session[:invalidUsername] = false
+                    session[:logged_in] = true
                     return true
                 end
             end
             session[:invalidUsername] = true
+            session[:logged_in] = false
             return false
         end
 
         usernames.each do |name|
             if name.first == username
                 session[:invalidUsername] = true
+                session[:logged_in] = false
                 return false
             end
         end
 
         if username.include?(' ')
             session[:invalidUsername] = true
+            session[:logged_in] = false
             return false
         end
 
         session[:invalidUsername] = false
+        session[:logged_in] = true
         true
     end
 
@@ -92,26 +96,31 @@ class User
             mails.each do |mail_|
                 if mail_.first == mail
                     session[:invalidMail] = false
+                    session[:logged_in] = true
                     return true
                 end
             end
             session[:invalidMail] = true
+            session[:logged_in] = false
             return false
         end
 
         mails.each do |mail_|
             if mail_.first == mail
                 session[:invalidMail] = true
+                session[:logged_in] = false
                 return false
             end
         end
 
         if mail.include?(' ')
             session[:invalidMail] = true
+            session[:logged_in] = false
             return false
         end
 
         session[:invalidMail] = false
+        session[:logged_in] = true
         true
     end
 

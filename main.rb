@@ -37,6 +37,11 @@ class Main < Sinatra::Base
         redirect user.redirectURL
     end
 
+    get '/logout' do
+        session.destroy
+        redirect '/'
+    end
+
     get '/reseplanerare' do
         @user = session[:username]
         @stations = StationHandler.getAllStations
@@ -44,8 +49,8 @@ class Main < Sinatra::Base
     end
 
     post '/reseplanerare' do
-        route_redirect = Route.add_for_user(session[:username], session[:token], params[:start_station], params[:stop_station], params[:date_and_time], session) # gör till objekt
-        redirect '/user/theo'
+        route_redirect = Route.add_for_user(session[:username], session[:token], params[:start_station], params[:stop_station], params[:date_and_time], params[:reacuring], session) # gör till objekt
+        redirect "/user/#{session[:username]}"
     end
 
     get '/token' do

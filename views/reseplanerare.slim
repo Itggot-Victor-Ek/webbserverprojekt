@@ -24,12 +24,13 @@ form action='/reseplanerare' method='post'
                         $('#datetimepicker').datetimepicker({
                             inline: true,
                             sideBySide: true,
-                            format: 'YYYY-M-d HH:mm',
+                            format: 'YYYY-MM-D HH:mm',
                             use24hours: true
                         });
                     });
-
-
+        .form-check
+            input.form-check-input type="checkbox" name="reacuring" id="checkbox-input"
+            label.form-check-label for="checkbox-input" Repeat this route
 
 
         datalist id="start_stations"

@@ -28,8 +28,11 @@ html
     body
         nav
             a.m-5 href="/" Home
-            a.m-5 href="/register" Create Account
-            a.m-5 href="/login" Login
+            -if session[:logged_in]
+                a.m-5 href="/logout" Logout
+            -else
+                a.m-5 href="/login" Login
+                a.m-5 href="/register" Create Account
         .container.text-white.d-flex.flex-column
             == yield
     /.anim
