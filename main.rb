@@ -53,6 +53,10 @@ class Main < Sinatra::Base
         redirect "/user/#{session[:username]}"
     end
 
+    get '/choose_routes' do
+        slim :choose_routes
+    end
+
     get '/token' do
         @authorization = Authorization.new
         session[:token] = @authorization.token

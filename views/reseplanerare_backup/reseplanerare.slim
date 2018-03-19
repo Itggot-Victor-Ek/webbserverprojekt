@@ -1,0 +1,48 @@
+form action='/reseplanerare' method='post'
+
+    .d-felx.p-2
+        .input-group.mb-3
+            .input-group-prepend.col
+                span.input-group-text id="span"Start station
+                input.form-control id="start_station" name="start_station" list="start_stations" placeholder="Start Station" aria-describedby="span"
+
+            .input-group-prepend.col
+                span.input-group-text id="span2"Stop station
+                input.form-control id="stop_station" name="stop_station" list="stop_stations" placeholder="Stop Station" aria-describedby="span2"
+        -if session[:bad_route]
+            small.form-text.text-danger =session[:bad_route_messege]
+
+        .container.d-flex.justify-content-center
+            div style="overflow:hidden;"
+                .form-group
+                    .row style="width: 700px; display: flex; justify-content: space-around;"
+                        .col-md-8.mr-5.ml-5
+                            #datetimepicker data-target-input="nearest"
+                                input.hidden-input data-target="#datetimepicker" id="date_and_time" name="date_and_time" type="text"
+                javascript:
+                    $(function () {
+                        $('#datetimepicker').datetimepicker({
+                            inline: true,
+                            sideBySide: true,
+                            format: 'YYYY-MM-D HH:mm',
+                            use24hours: true
+                        });
+                    });
+        .form-check
+            input.form-check-input type="checkbox" name="reacuring" id="checkbox-input"
+            label.form-check-label for="checkbox-input" Repeat this route
+
+
+        datalist id="start_stations"
+
+        datalist id="stop_stations"
+
+          template id="resultstemplate"
+                -@stations.each do |station|
+                    option value="#{station[0]}" =station[0]
+
+
+        button.btn.btn-primary type='submit' Submit
+
+
+script src="/js/limit_results.js"
