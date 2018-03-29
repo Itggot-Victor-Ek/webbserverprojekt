@@ -1,3 +1,7 @@
+* {
+    font-family: 'lobster';
+}
+
 body {
     display: flex;
     align-items: center;
@@ -41,7 +45,7 @@ body {
 }
 
 .color-green {
-    background-color: #222;
+    background-color: #006378;
 }
 
 .margin-top-table {

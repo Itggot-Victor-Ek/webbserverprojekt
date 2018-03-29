@@ -18,7 +18,7 @@ class Main < Sinatra::Base
     end
 
     post '/register' do
-        user = User.create(params['name'], params['username'], params['email'], params['password'], session)
+        user = User.create( params['name'], params['username'], params['email'], params['password'], session)
         redirect user.redirectURL
     end
 
@@ -49,12 +49,8 @@ class Main < Sinatra::Base
     end
 
     post '/reseplanerare' do
-        route_redirect = Route.add_for_user(session[:username], session[:token], params[:start_station], params[:stop_station], params[:date_and_time], params[:reacuring], session) # gör till objekt
-        redirect "/user/#{session[:username]}"
-    end
-
-    get '/choose_routes' do
-        slim :choose_routes
+        Route.add_for_user(session[:username], session[:token], params[:start_station], params[:stop_station], params[:date_and_time], params['reacuring'], session)
+        redirect "user/#{session[:username]}"
     end
 
     get '/token' do

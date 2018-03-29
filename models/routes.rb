@@ -1,11 +1,11 @@
-class Route
+class Route < BaseClass
     def self.add_for_user(_username, bearer_token, start_station, stop_station, date_and_time, reacuring, _session)
         @db = SQLite3::Database.open('db/Västtrafik.sqlite')
 
         if reacuring == "on"
-            reacuring = true
+            reacuring = "true"
         else
-            reacuring = false
+            reacuring = "false"
         end
         #checks if the trip already exists
         unless self.check_if_exists(_username, start_station, stop_station, date_and_time, _session)
@@ -48,7 +48,7 @@ class Route
                 end
 
                 leg.each do |data|
-                    Route.input_data(data, _username)
+                    Route.input_data(data, _username, reacuring)
                 end
                 # set connection_id back to nil when the route has ended
                 @connection_id = nil
@@ -56,7 +56,7 @@ class Route
         end
     end
 
-    def self.input_data(data, _username)
+    def self.input_data(data, _username, reacuring)
         #skip some stupid values
         unless data == ["valid", "false"] || data == ["alternative", "true"]
             data[1].each_with_index do |item, i|
@@ -72,6 +72,8 @@ class Route
                 destination_track = item.fetch('Destination', nil).fetch('track', nil)
                 destination_time =  item.fetch('Destination', nil).fetch('time',  nil)
                 destination_date =  item.fetch('Destination', nil).fetch('date',  nil)
+
+
 
                 # Input all data into the database
                 #origin_id = @db.execute('SELECT id FROM all_stops WHERE stop_name IS ?', [origin_name])

@@ -17,7 +17,7 @@ table.table.margin-top-table
     tbody
         -color = "color-green"
         -@routes.each_with_index do |info, i|
-            -if info[0] == info[-1]
+            -if info[0] == info[-2]
                 -if color == "color-green"
                     -color = "color-pink"
                 -else

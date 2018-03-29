@@ -1,5 +1,11 @@
-class User
+class User < BaseClass
+
+    table_name "users"
+    columns = name: "text", username: "text", mail: "text", password: "text"
+    create_table(SQLite3::Database.open('db/Västtrafik.sqlite'))
+
     attr_reader :name, :username, :mail, :redirectURL
+
     def initialize(name, username, mail, session)
         @register_error_URL = '/register'
         @login_error_URL = '/login'
@@ -38,10 +44,11 @@ class User
                 session[:invalidPassword] = false
                 session[:logged_in] = true
                 return true
+            else
+                session[:invalidPassword] = true
+                session[:logged_in] = false
+                return false
             end
-            session[:invalidPassword] = true
-            session[:logged_in] = false
-            return false
         end
 
         if password.empty? || password.include?(' ')

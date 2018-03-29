@@ -19,19 +19,9 @@ form action='/reseplanerare' method='post'
                         .col-md-8.mr-5.ml-5
                             #datetimepicker data-target-input="nearest"
                                 input.hidden-input data-target="#datetimepicker" id="date_and_time" name="date_and_time" type="text"
-                javascript:
-                    $(function () {
-                        $('#datetimepicker').datetimepicker({
-                            inline: true,
-                            sideBySide: true,
-                            format: 'YYYY-MM-D HH:mm',
-                            use24hours: true
-                        });
-                    });
         .form-check
-            input.form-check-input type="checkbox" name="reacuring" id="checkbox-input"
-            label.form-check-label for="checkbox-input" Repeat this route
-
+            input#defaultCheck1.form-check-input type="checkbox" name="reacuring"
+            label.form-check-label for="defaultCheck1" Reacure
 
         datalist id="start_stations"
 
@@ -41,8 +31,15 @@ form action='/reseplanerare' method='post'
                 -@stations.each do |station|
                     option value="#{station[0]}" =station[0]
 
+        button.btn.btn-outline-danger type='submit' Submit
 
-        button.btn.btn-primary type='submit' Submit
-
-
+        javascript:
+            $(function () {
+                $('#datetimepicker').datetimepicker({
+                    inline: true,
+                    sideBySide: true,
+                    format: 'YYYY-MM-D HH:mm',
+                    use24hours: true
+                });
+            });
 script src="/js/limit_results.js"
