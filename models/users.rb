@@ -1,7 +1,7 @@
 class User < BaseClass
 
     table_name "users"
-    columns = name: "text", username: "text", mail: "text", password: "text"
+    columns name: "text", username: "text", mail: "text", password: "text"
     create_table(SQLite3::Database.open('db/Västtrafik.sqlite'))
 
     attr_reader :name, :username, :mail, :redirectURL

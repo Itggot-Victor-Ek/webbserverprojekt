@@ -17,7 +17,7 @@ class BaseClass
         unless self.table_exists?
             # column_name = @columns.keys.join(", ")
             # column_type = @columns.values
-            @columns_joined = join_column
+            @columns_joined = self.join_columns(@columns)
 
             @db.execute("CREATE TABLE [schema_name].#{@table_name}()")
 
@@ -30,6 +30,10 @@ class BaseClass
 
     def self.table_exists?
         return @db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='#{@table_name}'")
+    end
+
+    def self.join_columns(hash)    #parse_columns instead of join_columns?
+        return hash.keys.join(", ")
     end
 
 end

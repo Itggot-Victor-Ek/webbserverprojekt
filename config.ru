@@ -13,6 +13,9 @@ Bundler.require
 require_relative 'main'
 
 #Load models
+Dir["models"].each_child do |child|
+    require_relative "models/#{child}"
+end
 require_relative 'models/baseClass'
 require_relative 'models/authorization'
 require_relative 'models/users'
