@@ -20,6 +20,7 @@ class BaseClass
             @columns_joined = self.join_columns(@columns)
 
             @db.execute("CREATE TABLE [schema_name].#{@table_name}()")
+            #can i commit now???? 😅
 
         end
     end
