@@ -2,6 +2,7 @@ class Route < BaseClass
     def self.add_for_user(_username, bearer_token, start_station, stop_station, date_and_time, recurring, _session)
         @db = SQLite3::Database.open('db/Västtrafik.sqlite')
 
+        #This is a string since booleans crashed last time
         if recurring != "true"
             recurring = "false"
         end
