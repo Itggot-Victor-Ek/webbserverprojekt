@@ -1,7 +1,7 @@
 class BaseClass
 
     def self.delete_table()
-
+        @db.execute("DROP TABLE [IF EXISTS] [schema_name.]#{@table_name}")
     end
 
     def self.table_name(table_name)
