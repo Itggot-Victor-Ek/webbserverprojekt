@@ -49,7 +49,7 @@ class Main < Sinatra::Base
     end
 
     post '/reseplanerare' do
-        Route.add_for_user(session[:username], session[:token], params[:start_station], params[:stop_station], params[:date_and_time], params['reacuring'], session)
+        Route.add_for_user(session[:username], session[:token], params[:start_station], params[:stop_station], params[:date_and_time], params['recurring'], session)
         redirect "user/#{session[:username]}"
     end
 

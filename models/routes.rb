@@ -1,11 +1,9 @@
 class Route < BaseClass
-    def self.add_for_user(_username, bearer_token, start_station, stop_station, date_and_time, reacuring, _session)
+    def self.add_for_user(_username, bearer_token, start_station, stop_station, date_and_time, recurring, _session)
         @db = SQLite3::Database.open('db/Västtrafik.sqlite')
 
-        if reacuring == "on"
-            reacuring = "true"
-        else
-            reacuring = "false"
+        if recurring != "true"
+            recurring = "false"
         end
         #checks if the trip already exists
         unless self.check_if_exists(_username, start_station, stop_station, date_and_time, _session)
@@ -48,7 +46,7 @@ class Route < BaseClass
                 end
 
                 leg.each do |data|
-                    Route.input_data(data, _username, reacuring)
+                    Route.input_data(data, _username, recurring)
                 end
                 # set connection_id back to nil when the route has ended
                 @connection_id = nil
@@ -56,7 +54,7 @@ class Route < BaseClass
         end
     end
 
-    def self.input_data(data, _username, reacuring)
+    def self.input_data(data, _username, recurring)
         #skip some stupid values
         unless data == ["valid", "false"] || data == ["alternative", "true"]
             data[1].each_with_index do |item, i|
@@ -80,10 +78,10 @@ class Route < BaseClass
                 #destination_id = @db.execute('SELECT id FROM all_stops WHERE stop_name IS ?', [destination_name])
                 @db.execute('INSERT INTO departure (vehicle_type, type, direction, origin_name,
                     origin_time, origin_date, origin_track, destination_name,
-                    destination_time, destination_date, destination_track, connection_id, parent_id, reacuring)
+                    destination_time, destination_date, destination_track, connection_id, parent_id, recurring)
                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [vehicle_type, type, direction,
                                                         origin_name, origin_time, origin_date, origin_track, destination_name,
-                                                        destination_time, destination_date, destination_track, @connection_id, @leg_id, reacuring])
+                                                        destination_time, destination_date, destination_track, @connection_id, @leg_id, recurring])
                 # Get the last id to be able to reference the full route
                 @connection_id = @db.execute('SELECT last_insert_rowid()') unless destination_name.nil?
 
@@ -112,8 +110,8 @@ class Route < BaseClass
           date = Time.new(dates[0], dates[1], dates[2], hours, minutes)
 
           if Time.new() > date
-            db.execute('DELETE FROM departure WHERE parent_id IS ? AND reacuring IS NOT "true"', [departure[0]])
-            db.execute('DELETE FROM user_departure_relation WHERE departure_id IS (SELECT id FROM departure id WHERE id IS ? AND reacuring IS NOT "true")', [departure[0]])
+            db.execute('DELETE FROM departure WHERE parent_id IS ? AND recurring IS NOT "true"', [departure[0]])
+            db.execute('DELETE FROM user_departure_relation WHERE departure_id IS (SELECT id FROM departure id WHERE id IS ? AND recurring IS NOT "true")', [departure[0]])
           end
         end
     end
