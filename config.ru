@@ -13,14 +13,9 @@ Bundler.require
 require_relative 'main'
 
 #Load models
-Dir["models"].each_child do |child|
-    require_relative "models/#{child}"
-end
-require_relative 'models/baseClass'
-require_relative 'models/authorization'
-require_relative 'models/users'
-require_relative 'models/stationHandler'
-require_relative 'models/routes'
+dir = Dir.glob("models/*.rb")
+dir.map { |x| require_relative "#{x}" }
+
 
 #Make Slim NICE!
 Slim::Engine.set_options pretty: true, sort_attrs: false
