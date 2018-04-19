@@ -1,7 +1,7 @@
 class User < BaseClass
 
     table_name "users"
-    column name: id:, "integer", name: "text", username: "text", mail: "text", password: "text"
+    columns id: "integer", name: "text", username: "text", mail: "text", password: "text"
     #create_table creates a table in the specefied database and if the last argument i returned false
     create_table(SQLite3::Database.open('db/Västtrafik.sqlite'), false)
 
@@ -33,7 +33,7 @@ class User < BaseClass
         #
         # db.execute('INSERT INTO users (name,username,mail,password) VALUES (?,?,?,?)', [name, username, mail, hashed_password])
 
-        insert({name: name, username: username, mail: mail, password: [password, requirements: [Password]]})
+        insert({name: name, username: [username, requirements: [""]], mail: mail, password: [password, requirements: [Password]]})
         new(name, username, mail, session)
     end
 

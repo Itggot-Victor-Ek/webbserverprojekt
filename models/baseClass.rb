@@ -54,11 +54,8 @@ class BaseClass
             values_query += '?,'
         end
         values_query[values_query.length-1] = ')'
-
         final_query = start_query + values_query
-
         @db.execute(final_query, values)
-
     end
 
     def self.table_exists?
