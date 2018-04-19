@@ -30,6 +30,34 @@ class BaseClass
     end
 
     def self.insert(hash)
+        columns_query = ""
+        values = []
+        hash.each_pair do |key,value|
+            if value.is_a Array
+                columns_query += key.first.to_s + ','
+                value[1][:requirements].each do |requirement|
+                    if requirement.is_a Password
+                        values << Password.encrypt(value)
+                    elsif "something else" == "add this"
+                        #do something
+                    end
+                end
+            else
+                columns_query += key.to_s + ','
+                values << value
+            end
+        end
+
+        start query = "INSERT INTO #{@table_name}(" + columns_query[0..columns_query.length-1] + ') '
+        values_query = "VALUES("
+        values.each do |value|
+            values_query += '?,'
+        end
+        values_query[values_query.length-1] = ')'
+
+        final_query = start_query + values_query
+
+        @db.execute(final_query, values)
 
     end
 

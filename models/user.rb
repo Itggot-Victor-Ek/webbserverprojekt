@@ -1,7 +1,7 @@
 class User < BaseClass
 
     table_name "users"
-    columns id: "integer", name: "text", username: "text", mail: "text", password: "text"
+    column name: id:, "integer", name: "text", username: "text", mail: "text", password: "text"
     #create_table creates a table in the specefied database and if the last argument i returned false
     create_table(SQLite3::Database.open('db/Västtrafik.sqlite'), false)
 
@@ -24,14 +24,16 @@ class User < BaseClass
     end
 
     def self.create(name, username, mail, password, session)
-        db = SQLite3::Database.open('db/Västtrafik.sqlite')
+        # db = SQLite3::Database.open('db/Västtrafik.sqlite')
+        #
+        # if !valid_username(username, db, session, false) || !valid_mail(mail, db, session, false)
+        #     return new('error', '/register', 'error', session)
+        # end
+        #
+        #
+        # db.execute('INSERT INTO users (name,username,mail,password) VALUES (?,?,?,?)', [name, username, mail, hashed_password])
 
-        if !valid_password(password, session, [false]) || !valid_username(username, db, session, false) || !valid_mail(mail, db, session, false)
-            return new('error', '/register', 'error', session)
-        end
-
-        hashed_password = BCrypt::Password.create(password)
-        db.execute('INSERT INTO users (name,username,mail,password) VALUES (?,?,?,?)', [name, username, mail, hashed_password])
+        insert({name: name, username: username, mail: mail, password: [password, requirements: [Password]]})
         new(name, username, mail, session)
     end
 
@@ -51,15 +53,6 @@ class User < BaseClass
                 return false
             end
         end
-
-        if password.empty? || password.include?(' ')
-            session[:invalidPassword] = true
-            session[:logged_in] = false
-            return false
-        end
-        session[:invalidPassword] = false
-        session[:logged_in] = true
-        true
     end
 
     def self.valid_username(username, db, session, login)
