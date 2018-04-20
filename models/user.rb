@@ -24,16 +24,8 @@ class User < BaseClass
     end
 
     def self.create(name, username, mail, password, session)
-        # db = SQLite3::Database.open('db/Västtrafik.sqlite')
-        #
-        # if !valid_username(username, db, session, false) || !valid_mail(mail, db, session, false)
-        #     return new('error', '/register', 'error', session)
-        # end
-        #
-        #
-        # db.execute('INSERT INTO users (name,username,mail,password) VALUES (?,?,?,?)', [name, username, mail, hashed_password])
-
-        insert({name: name, username: [username, requirements: [""]], mail: mail, password: [password, requirements: [Password]]})
+        #Gör 'no space', 'no duplicate' etc till symbol?
+        insert({name: name, username: [username, requirements: ["no duplicate", "no space"]], mail: [mail, requirements: ["no duplicate", "no space"]], password: [password, requirements: [Password, "no duplicate"]]})
         new(name, username, mail, session)
     end
 
@@ -71,23 +63,7 @@ class User < BaseClass
             return false
         end
 
-        usernames.each do |name|
-            if name.first == username
-                session[:invalidUsername] = true
-                session[:logged_in] = false
-                return false
-            end
-        end
 
-        if username.include?(' ')
-            session[:invalidUsername] = true
-            session[:logged_in] = false
-            return false
-        end
-
-        session[:invalidUsername] = false
-        session[:logged_in] = true
-        true
     end
 
     def self.valid_mail(mail, db, session, login)
@@ -105,24 +81,6 @@ class User < BaseClass
             session[:logged_in] = false
             return false
         end
-
-        mails.each do |mail_|
-            if mail_.first == mail
-                session[:invalidMail] = true
-                session[:logged_in] = false
-                return false
-            end
-        end
-
-        if mail.include?(' ')
-            session[:invalidMail] = true
-            session[:logged_in] = false
-            return false
-        end
-
-        session[:invalidMail] = false
-        session[:logged_in] = true
-        true
     end
 
     def self.login(name_option, password, session)

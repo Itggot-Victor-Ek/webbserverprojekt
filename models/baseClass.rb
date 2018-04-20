@@ -35,13 +35,7 @@ class BaseClass
         hash.each_pair do |key,value|
             if value.is_a Array
                 columns_query += key.first.to_s + ','
-                value[1][:requirements].each do |requirement|
-                    if requirement.is_a Password
-                        values << Password.encrypt(value)
-                    elsif "something else" == "add this"
-                        #do something
-                    end
-                end
+                requiremnet_checker(value[1][:requirements], key.to_s, value.first, values)
             else
                 columns_query += key.to_s + ','
                 values << value
@@ -79,6 +73,35 @@ class BaseClass
         #quick fix to remove the last comma
         final_string = final_string[0..-2]
         return final_string
+    end
+
+    def requiremnet_checker(requirements, column, value, values)
+        requirements.each do |requirement|
+            if requirement.is_a Password
+                value = password.encrypt(value)
+            elsif requirement == "no duplicate"
+                check_duplicate_in_database(value, column)
+            elsif requirement == 'no space'
+                no_space(value)
+            end
+        end
+    end
+
+    def check_duplicate_in_database(value, column)
+        data @db.execute("SELECT * FROM #{columns}")
+        data.each do |data_value|
+            if data_value.first == value
+                return false
+            end
+        end
+        return true
+    end
+
+    def no_space(value)
+        if value.include?(' ')
+            return false
+        end
+        true
     end
 
 end
