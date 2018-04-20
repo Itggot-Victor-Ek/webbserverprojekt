@@ -3,7 +3,7 @@ class Route < BaseClass
         @db = SQLite3::Database.open('db/Västtrafik.sqlite')
 
         #This is a string since booleans crashed last time
-        recurring = recurring ? 'true' : 'false'
+        recurring = recurring != 'true'  ? 'false' : recurring
 
         #checks if the trip already exists
         unless self.check_if_exists(_username, start_station, stop_station, date_and_time, _session)
