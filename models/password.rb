@@ -1,20 +1,30 @@
 class Password
-        def self.encrypt(password)
-            if valid_password(password)
-                return hashed_password = BCrypt::Password.create(password)
+        def self.encrypt(password, values)
+            if self.valid_password(password)
+                hashed_password = BCrypt::Password.create(password)
+                values << hashed_password
+                return values
             else
-                return "what should i return?"
+                return false
+            end
+        end
+
+        def self.is_a?(obj)
+            if obj == self
+                return true
+            else
+                return false
             end
         end
 
 
         private
 
-        def valid_password(password)
+        def self.valid_password(password)
             if password.empty? || password.include?(' ')
                 return false
             end
-            true
+            return true
         end
 
 

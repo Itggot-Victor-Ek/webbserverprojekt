@@ -1,15 +1,3 @@
-/a href="#{@authorization.data}" xml file
-/ p "#{@authorization.data[0]}"
-/ p "#{@authorization.data[1]}" <- Time when theos bus leaves
-.dark-background
-    -@authorization.trips[0].each do |leg|
-        /-p leg
-        p bus name:#{leg['Leg']['name']}
-        p direction: #{leg['Leg']['direction']}
-        p departure time: #{leg['Leg']['Origin']['time']}
-        p arrival time: #{leg['Leg']['Destination']['time']}
-        p ______________________________
-    end
 p "#{@authorization.token}" <-token
 br
 

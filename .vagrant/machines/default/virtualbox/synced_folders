@@ -1,1 +1,1 @@
-{"virtualbox":{"/vagrant":{"guestpath":"/vagrant","hostpath":"C:/Users/victor.ek/Documents/GitHub/webbserverprojekt","disabled":false,"__vagrantfile":true}}}
+{"virtualbox":{"/tmp/cache":{"guestpath":"/tmp/cache","hostpath":"C:/","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"C:/Users/victor.ek/Documents/GitHub/webbserverprojekt","disabled":false,"__vagrantfile":true}}}

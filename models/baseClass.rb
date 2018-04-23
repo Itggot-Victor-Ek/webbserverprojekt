@@ -24,7 +24,6 @@ class BaseClass
             columns_query = self.join_columns(@columns, use_row_id)
 
             final_query = start_query + columns_query + ")" + row_id_query
-
             @db.execute(final_query)
         end
     end
@@ -33,23 +32,37 @@ class BaseClass
         columns_query = ""
         values = []
         hash.each_pair do |key,value|
-            if value.is_a Array
-                columns_query += key.first.to_s + ','
-                requiremnet_checker(value[1][:requirements], key.to_s, value.first, values)
+            if value.is_a? Array
+                columns_query += key.to_s + ','
+                result = self.requiremnet_checker(value[1][:requirements], key.to_s, value.first, values)
+                if result.is_a? Array
+                    p "result"
+                    p result[1]
+                    values = result[1]
+                elsif result
+                    p value[0]
+                    values << value
+                else
+                    return false
+                end
+
             else
                 columns_query += key.to_s + ','
                 values << value
             end
         end
 
-        start query = "INSERT INTO #{@table_name}(" + columns_query[0..columns_query.length-1] + ') '
+        start_query = "INSERT INTO #{@table_name}(" + columns_query[0..columns_query.length-2] + ') '
         values_query = "VALUES("
+        p values
         values.each do |value|
             values_query += '?,'
         end
         values_query[values_query.length-1] = ')'
         final_query = start_query + values_query
+        p final_query
         @db.execute(final_query, values)
+        return true
     end
 
     def self.table_exists?
@@ -75,20 +88,32 @@ class BaseClass
         return final_string
     end
 
-    def requiremnet_checker(requirements, column, value, values)
+    def self.requiremnet_checker(requirements, column, value, values)
+        requirements_met = true
         requirements.each do |requirement|
-            if requirement.is_a Password
-                value = password.encrypt(value)
+
+            if requirement.is_a? Password
+                new_values = Password.encrypt(value, values)
+                p "vvvv new values vvvv"
+                p new_values
+                sleep(20)
+                condition_met = new_values
             elsif requirement == "no duplicate"
-                check_duplicate_in_database(value, column)
+                condition_met = self.check_duplicate_in_database(value, column)
             elsif requirement == 'no space'
-                no_space(value)
+                condition_met = self.no_space(value)
+            end
+
+            if !condition_met && !new_values
+                requirements_met = false
             end
         end
+        return requirements_met, new_values if defined? new_values
+        return requirements_met
     end
 
-    def check_duplicate_in_database(value, column)
-        data @db.execute("SELECT * FROM #{columns}")
+    def self.check_duplicate_in_database(value, column)
+        data = @db.execute("SELECT #{column} FROM #{@table_name}")
         data.each do |data_value|
             if data_value.first == value
                 return false
@@ -97,11 +122,10 @@ class BaseClass
         return true
     end
 
-    def no_space(value)
+    def self.no_space(value)
         if value.include?(' ')
             return false
         end
-        true
+        return true
     end
-
 end

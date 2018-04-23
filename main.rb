@@ -45,6 +45,7 @@ class Main < Sinatra::Base
     get '/reseplanerare' do
         @user = session[:username]
         @stations = StationHandler.getAllStations
+        session[:token] = Authorization.new.token
         slim :reseplanerare
     end
 

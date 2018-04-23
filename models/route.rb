@@ -74,11 +74,9 @@ class Route < BaseClass
 
 
                 # Input all data into the database
-                #origin_id = @db.execute('SELECT id FROM all_stops WHERE stop_name IS ?', [origin_name])
-                #destination_id = @db.execute('SELECT id FROM all_stops WHERE stop_name IS ?', [destination_name])
                 @db.execute('INSERT INTO departure (vehicle_type, type, direction, origin_name,
                     origin_time, origin_date, origin_track, destination_name,
-                    destination_time, destination_date, destination_track, connection_id, parent_id, recurring)
+                    destination_time, destination_date, destination_track, connection_id, parent_id, reacuring)
                     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [vehicle_type, type, direction,
                                                         origin_name, origin_time, origin_date, origin_track, destination_name,
                                                         destination_time, destination_date, destination_track, @connection_id, @leg_id, recurring])
