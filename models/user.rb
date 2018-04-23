@@ -1,9 +1,11 @@
 class User < BaseClass
 
+
     table_name "users"
     columns id: "integer", name: "text", username: "text", mail: "text", password: "text"
     #create_table creates a table in the specefied database and if the last argument i returned false
     create_table(SQLite3::Database.open('db/Västtrafik.sqlite'), false)
+
 
     attr_reader :name, :username, :mail, :redirectURL
 
