@@ -32,7 +32,7 @@ class BaseClass
         hash.each_pair do |key,value|
             if value.is_a? Array
                 columns_query += key.to_s + ','
-                result = self.check_requirements(value[1][:requirements], key.to_s, value.first, values)
+                result = self.apply_requirements(value[1][:requirements], key.to_s, value.first, values)
                 if result.is_a? Array
                     values = result[1]
                 elsif result
@@ -82,7 +82,7 @@ class BaseClass
         return final_string
     end
 
-    def self.check_requirements(requirements, column, value, values)
+    def self.apply_requirements(requirements, column, value, values)
         requirements_met = true
         requirements.each do |requirement|
             if requirement.is_a? Password
