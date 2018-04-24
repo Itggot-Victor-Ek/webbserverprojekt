@@ -12,6 +12,9 @@ class BaseClass
         @columns = hash
     end
 
+    #create_table creates a table in the specified database, if the last
+    #argument is false, the database will take the first column as the primary
+    #key
     def self.create_table(db, use_row_id)
         @db = db
         unless self.table_exists?
@@ -85,9 +88,9 @@ class BaseClass
             if requirement.is_a? Password
                 @new_values = Password.encrypt(value, values)
                 condition_met = @new_values
-            elsif requirement == "no duplicate"
+            elsif requirement == :unique
                 condition_met = self.check_duplicate_in_database(value, column)
-            elsif requirement == 'no space'
+            elsif requirement == :no_space
                 condition_met = self.no_space(value)
             end
 

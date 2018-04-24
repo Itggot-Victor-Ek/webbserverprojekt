@@ -3,7 +3,6 @@ class User < BaseClass
 
     table_name "users"
     columns id: "integer", name: "text", username: "text", mail: "text", password: "text"
-    #create_table creates a table in the specefied database and if the last argument i returned false
     create_table(SQLite3::Database.open('db/Västtrafik.sqlite'), false)
 
 
@@ -26,12 +25,11 @@ class User < BaseClass
     end
 
     def self.create(name, username, mail, password, session)
-        #Gör 'no space', 'no duplicate' etc till symbol?
         if insert({
                     name: name,
-                    username: [username, requirements: ["no duplicate", "no space"]],
-                    mail: [mail, requirements: ["no duplicate", "no space"]],
-                    password: [password, requirements: [Password, "no duplicate"]]
+                    username: [username, requirements: [:unique, :no_space]],
+                    mail: [mail, requirements: [:unique, :no_space]],
+                    password: [password, requirements: [Password]]
                     })
 
             session[:invalidMail] = false
