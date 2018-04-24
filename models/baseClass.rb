@@ -1,7 +1,7 @@
 class BaseClass
 
     def self.delete_table()
-        @db.execute("DROP TABLE [IF EXISTS] [schema_name.]#{@table_name}")
+        @db.execute("DROP TABLE #{@table_name}")
     end
 
     def self.table_name(table_name)
@@ -15,15 +15,10 @@ class BaseClass
     def self.create_table(db, use_row_id)
         @db = db
         unless self.table_exists?
-            row_id_query = ""
-            if !use_row_id
-                row_id_query = "[WITHOUT ROWID]"
-            end
-
-            start_query = "CREATE TABLE [schema_name].#{@table_name}("
+            start_query = "CREATE TABLE #{@table_name}("
             columns_query = self.join_columns(@columns, use_row_id)
 
-            final_query = start_query + columns_query + ")" + row_id_query
+            final_query = start_query + columns_query + ")"
             @db.execute(final_query)
         end
     end
@@ -34,7 +29,7 @@ class BaseClass
         hash.each_pair do |key,value|
             if value.is_a? Array
                 columns_query += key.to_s + ','
-                result = self.requiremnet_checker(value[1][:requirements], key.to_s, value.first, values)
+                result = self.check_requirements(value[1][:requirements], key.to_s, value.first, values)
                 if result.is_a? Array
                     values = result[1]
                 elsif result
@@ -64,7 +59,7 @@ class BaseClass
     private
 
     def self.table_exists?
-        return @db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='#{@table_name}'")
+        return @db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='#{@table_name}'")[0]
     end
 
     #takes in a hash and joins the key and value to make a sqlite query
@@ -84,7 +79,7 @@ class BaseClass
         return final_string
     end
 
-    def self.requiremnet_checker(requirements, column, value, values)
+    def self.check_requirements(requirements, column, value, values)
         requirements_met = true
         requirements.each do |requirement|
             if requirement.is_a? Password
@@ -107,11 +102,9 @@ class BaseClass
     end
 
     def self.check_duplicate_in_database(value, column)
-        data = @db.execute("SELECT #{column} FROM #{@table_name}")
-        data.each do |data_value|
-            if data_value.first == value
-                return false
-            end
+        data = @db.execute("SELECT #{column} FROM #{@table_name} WHERE #{column} IS ?",[value])
+        if data != []
+            return false
         end
         return true
     end
