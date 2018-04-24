@@ -36,12 +36,9 @@ class BaseClass
                 columns_query += key.to_s + ','
                 result = self.requiremnet_checker(value[1][:requirements], key.to_s, value.first, values)
                 if result.is_a? Array
-                    p "result"
-                    p result[1]
                     values = result[1]
                 elsif result
-                    p value[0]
-                    values << value
+                    values << value[0]
                 else
                     return false
                 end
@@ -54,7 +51,6 @@ class BaseClass
 
         start_query = "INSERT INTO #{@table_name}(" + columns_query[0..columns_query.length-2] + ') '
         values_query = "VALUES("
-        p values
         values.each do |value|
             values_query += '?,'
         end
@@ -65,11 +61,11 @@ class BaseClass
         return true
     end
 
+    private
+
     def self.table_exists?
         return @db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='#{@table_name}'")
     end
-
-    private
 
     #takes in a hash and joins the key and value to make a sqlite query
     def self.join_columns(hash, use_row_id)
@@ -91,24 +87,22 @@ class BaseClass
     def self.requiremnet_checker(requirements, column, value, values)
         requirements_met = true
         requirements.each do |requirement|
-
             if requirement.is_a? Password
-                new_values = Password.encrypt(value, values)
-                p "vvvv new values vvvv"
-                p new_values
-                sleep(20)
-                condition_met = new_values
+                @new_values = Password.encrypt(value, values)
+                condition_met = @new_values
             elsif requirement == "no duplicate"
                 condition_met = self.check_duplicate_in_database(value, column)
             elsif requirement == 'no space'
                 condition_met = self.no_space(value)
             end
 
-            if !condition_met && !new_values
+            if !condition_met && !@new_values
                 requirements_met = false
             end
         end
-        return requirements_met, new_values if defined? new_values
+        if defined? @new_values
+            return [requirements_met, @new_values]
+        end
         return requirements_met
     end
 

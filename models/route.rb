@@ -108,8 +108,8 @@ class Route < BaseClass
           date = Time.new(dates[0], dates[1], dates[2], hours, minutes)
 
           if Time.new() > date
-            db.execute('DELETE FROM departure WHERE parent_id IS ? AND recurring IS NOT "true"', [departure[0]])
-            db.execute('DELETE FROM user_departure_relation WHERE departure_id IS (SELECT id FROM departure id WHERE id IS ? AND recurring IS NOT "true")', [departure[0]])
+            db.execute('DELETE FROM departure WHERE parent_id IS ? AND reacuring IS NOT "true"', [departure[0]])
+            db.execute('DELETE FROM user_departure_relation WHERE departure_id IS (SELECT id FROM departure id WHERE id IS ? AND reacuring IS NOT "true")', [departure[0]])
           end
         end
     end

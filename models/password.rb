@@ -17,7 +17,6 @@ class Password
             end
         end
 
-
         private
 
         def self.valid_password(password)
