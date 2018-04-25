@@ -61,3 +61,4 @@ db/Västtrafik.sqlite
 .vagrant/machines/default/virtualbox/id
 .vagrant/machines/default/virtualbox/action_provision
 .vagrant/machines/default/virtualbox/index_uuid
+db/Västtrafik.sqlite
