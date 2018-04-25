@@ -1,7 +1,13 @@
 class Route < BaseClass
-    def self.add_for_user(_username, bearer_token, start_station, stop_station, date_and_time, recurring, _session)
-        @db = SQLite3::Database.open('db/Västtrafik.sqlite')
+    table_name "departures"
+    columns(id: "integer", vehicle_type: "text", type: "text", direction: 'text',
+            origin_name: "text", origin_time: "text", origin_date: "text",
+            origin_track: "text", destination_name: 'text', destination_time: 'text',
+            destination_date: 'text', destination_track: 'text', connection_id: 'text',
+            parent_id: 'text', recurring: 'boolean')
+    create_table(SQLite3::Database.open('db/Västtrafik.sqlite'), false)
 
+    def self.add_for_user(_username, bearer_token, start_station, stop_station, date_and_time, recurring, _session)
         #This is a string since booleans crashed last time
         recurring = recurring != 'true'  ? 'false' : recurring
 
@@ -36,7 +42,7 @@ class Route < BaseClass
             legs = [JSON.parse(json_body)['TripList']['Trip']][0]
             # starting loop to store the relevant data
             legs.each do |leg|
-                @leg_id = @db.execute('SELECT id FROM departure where id = (SELECT max(id) FROM departure)')
+                @leg_id = @db.execute("SELECT id FROM #{@table_name} where id = (SELECT max(id) FROM #{@table_name})")
 
                 #check if the table is empty, if so set id to 1
                 if @leg_id.empty?
@@ -71,17 +77,25 @@ class Route < BaseClass
                 destination_time =  item.fetch('Destination', nil).fetch('time',  nil)
                 destination_date =  item.fetch('Destination', nil).fetch('date',  nil)
 
+                insert({
+                            vehicle_type: vehicle_type,
+                            type: type,
+                            direction: direction,
+                            origin_name: origin_name,
+                            origin_time: origin_time,
+                            origin_date: origin_date,
+                            origin_track: origin_track,
+                            destination_name: destination_name,
+                            destination_time: destination_time,
+                            destination_date: destination_date,
+                            destination_track: destination_track,
+                            connection_id: @connection_id,
+                            parent_id: @leg_id,
+                            recurring: recurring
+                            })
 
-
-                # Input all data into the database
-                @db.execute('INSERT INTO departure (vehicle_type, type, direction, origin_name,
-                    origin_time, origin_date, origin_track, destination_name,
-                    destination_time, destination_date, destination_track, connection_id, parent_id, reacuring)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [vehicle_type, type, direction,
-                                                        origin_name, origin_time, origin_date, origin_track, destination_name,
-                                                        destination_time, destination_date, destination_track, @connection_id, @leg_id, recurring])
                 # Get the last id to be able to reference the full route
-                @connection_id = @db.execute('SELECT last_insert_rowid()') unless destination_name.nil?
+                @connection_id = @db.execute('SELECT last_insert_rowid()').first.first unless destination_name.nil?
 
                 # if it's the starting station make a relation between the user and route
                 if i == 0
@@ -93,13 +107,11 @@ class Route < BaseClass
     end
 
     def self.for_user(username)
-        db = SQLite3::Database.open('db/Västtrafik.sqlite')
-        return db.execute('SELECT * FROM departure WHERE parent_id IN (SELECT departure_id FROM user_departure_relation WHERE user_id IN (SELECT id FROM users WHERE username IS ?))', [username])
+        return @db.execute("SELECT * FROM #{@table_name} WHERE parent_id IN (SELECT departure_id FROM user_departure_relation WHERE user_id IN (SELECT id FROM users WHERE username IS ?))", [username])
     end
 
     def self.remove_old_routes(username)
-        db = SQLite3::Database.open('db/Västtrafik.sqlite')
-        departures = db.execute('SELECT * FROM departure')
+        departures = @db.execute("SELECT * FROM #{@table_name}")
 
         departures.each do |departure|
           dates = departure[6].split("-")
@@ -108,14 +120,14 @@ class Route < BaseClass
           date = Time.new(dates[0], dates[1], dates[2], hours, minutes)
 
           if Time.new() > date
-            db.execute('DELETE FROM departure WHERE parent_id IS ? AND reacuring IS NOT "true"', [departure[0]])
-            db.execute('DELETE FROM user_departure_relation WHERE departure_id IS (SELECT id FROM departure id WHERE id IS ? AND reacuring IS NOT "true")', [departure[0]])
+            @db.execute("DELETE FROM #{@table_name} WHERE parent_id IS ? AND recurring IS NOT 'true'", [departure[0]])
+            @db.execute("DELETE FROM user_departure_relation WHERE departure_id IS (SELECT id FROM #{@table_name} id WHERE id IS ? AND recurring IS NOT 'true')", [departure[0]])
           end
         end
     end
 
     def self.check_if_exists(username, start_station, stop_station, date_and_time, session)
-        trips = @db.execute("SELECT * FROM departure WHERE origin_name IS ? AND datetime(origin_time) < datetime(?)", [start_station, date_and_time])
+        trips = @db.execute("SELECT * FROM #{@table_name} WHERE origin_name IS ? AND datetime(origin_time) < datetime(?)", [start_station, date_and_time])
         connections = @db.execute('SELECT * FROM user_departure_relation WHERE user_id IS (SELECT id FROM users WHERE username IS ?)',[username])
         user_id = @db.execute('SELECT id FROM users WHERE username IS ?', [username])
         found_atleast_one_connection = false

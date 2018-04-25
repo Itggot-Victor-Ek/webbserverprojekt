@@ -12,6 +12,9 @@ class BaseClass
         @columns = hash
     end
 
+    #create_table creates a table in the specified database, if the last
+    #argument is false, the database will take the first column as the primary
+    #key
     def self.create_table(db, use_row_id)
         @db = db
         unless self.table_exists?
@@ -29,7 +32,7 @@ class BaseClass
         hash.each_pair do |key,value|
             if value.is_a? Array
                 columns_query += key.to_s + ','
-                result = self.check_requirements(value[1][:requirements], key.to_s, value.first, values)
+                result = self.apply_requirements(value[1][:requirements], key.to_s, value.first, values)
                 if result.is_a? Array
                     values = result[1]
                 elsif result
@@ -79,15 +82,15 @@ class BaseClass
         return final_string
     end
 
-    def self.check_requirements(requirements, column, value, values)
+    def self.apply_requirements(requirements, column, value, values)
         requirements_met = true
         requirements.each do |requirement|
             if requirement.is_a? Password
                 @new_values = Password.encrypt(value, values)
                 condition_met = @new_values
-            elsif requirement == "no duplicate"
+            elsif requirement == :unique
                 condition_met = self.check_duplicate_in_database(value, column)
-            elsif requirement == 'no space'
+            elsif requirement == :no_space
                 condition_met = self.no_space(value)
             end
 
