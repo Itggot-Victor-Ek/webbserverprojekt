@@ -1,8 +1,11 @@
 class User < BaseClass
 
-
     table_name "users"
-    columns id: "integer", name: "text", username: "text", mail: "text", password: "text"
+    column id: "integer"
+    column name: "text"
+    column username: "text"
+    column mail: "text"
+    column password: "text"
     create_table(SQLite3::Database.open('db/Västtrafik.sqlite'), false)
     update({ username: ["Joey Dangers", requirements:[:unique, :no_space]]}, "test")
     attr_reader :name, :username, :mail, :redirectURL

@@ -1,10 +1,22 @@
 class Route < BaseClass
     table_name "departures"
-    columns(id: "integer", vehicle_type: "text", type: "text", direction: 'text',
-            origin_name: "text", origin_time: "text", origin_date: "text",
-            origin_track: "text", destination_name: 'text', destination_time: 'text',
-            destination_date: 'text', destination_track: 'text', connection_id: 'text',
-            parent_id: 'text', recurring: 'boolean')
+
+    column id: "integer"
+    column vehicle_type: "text"
+    column type: "text"
+    column direction: 'text'
+    column origin_name: "text"
+    column origin_time: "text"
+    column origin_date: "text"
+    column origin_track: "text"
+    column destination_name: 'text'
+    column destination_time: 'text'
+    column destination_date: 'text'
+    column destination_track: 'text'
+    column connection_id: 'text'
+    column parent_id: 'text'
+    column recurring: 'boolean'
+
     create_table(SQLite3::Database.open('db/Västtrafik.sqlite'), false)
 
     def self.add_for_user(_username, bearer_token, start_station, stop_station, date_and_time, recurring, _session)
@@ -13,7 +25,7 @@ class Route < BaseClass
 
         #checks if the trip already exists
         private
-        
+
         unless self.check_if_exists(_username, start_station, stop_station, date_and_time, _session)
 
             date = date_and_time.split(" ")[0]

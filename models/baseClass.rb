@@ -8,8 +8,12 @@ class BaseClass
         @table_name = table_name
     end
 
-    def self.columns(hash)
-        @columns = hash
+    # def self.columns(hash)
+    #     @columns = hash
+    # end
+    def self.column(hash)
+        @columns ||= {}
+        @columns.merge!(hash)
     end
 
     #create_table creates a table in the specified database, if the last
@@ -41,7 +45,7 @@ class BaseClass
         columns.each do |column|
             columns_query += column + ','
         end
-        columns_query = columns_query.delete_at(columns_query.length-1)
+        columns_query = columns_query[0..columns_query.length-2]
         start_query = "INSERT INTO #{@table_name}(" + columns_query + ') '
         values_query = "VALUES("
         values.each do |value|
@@ -49,12 +53,13 @@ class BaseClass
         end
         values_query[values_query.length-1] = ')'
         final_query = start_query + values_query
+        p final_query
+        p values
         @db.execute(final_query, values)
         return true
     end
 
     def self.update(hash, old_value)
-        p "hsduhasudasudhsaidhsaui"
         result = extract_values(hash)
         values = []
         column = []
@@ -70,7 +75,6 @@ class BaseClass
         where_query = "WHERE #{column[0]} IS #{old_value}"
 
         final_query = start_query + update_columns_query + where_query
-        p final_query
         @db.execute(final_query, values)
         return values[0]
     end
