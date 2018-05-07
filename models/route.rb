@@ -12,6 +12,8 @@ class Route < BaseClass
         recurring = recurring != 'true'  ? 'false' : recurring
 
         #checks if the trip already exists
+        private
+        
         unless self.check_if_exists(_username, start_station, stop_station, date_and_time, _session)
 
             date = date_and_time.split(" ")[0]

@@ -4,8 +4,7 @@ class User < BaseClass
     table_name "users"
     columns id: "integer", name: "text", username: "text", mail: "text", password: "text"
     create_table(SQLite3::Database.open('db/Västtrafik.sqlite'), false)
-
-
+    update({ username: ["Joey Dangers", requirements:[:unique, :no_space]]}, "test")
     attr_reader :name, :username, :mail, :redirectURL
 
     def initialize(name, username, mail, session)
@@ -57,6 +56,13 @@ class User < BaseClass
             end
         end
         new('error', '/login', 'error', session)
+    end
+
+    def self.change_username(new_username)
+        result = update({username: [new_username, requirement:[:unique, :no_space]]}, @username)
+        unless result
+            @username = result
+        end
     end
 
     private

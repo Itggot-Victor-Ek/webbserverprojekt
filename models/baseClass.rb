@@ -27,11 +27,66 @@ class BaseClass
     end
 
     def self.insert(hash)
+        result = extract_values(hash)
+        values = []
+        columns = []
+        if result
+            values = result[0]
+            columns = result[1]
+        else
+            return false
+        end
+
         columns_query = ""
+        columns.each do |column|
+            columns_query += column + ','
+        end
+        columns_query = columns_query.delete_at(columns_query.length-1)
+        start_query = "INSERT INTO #{@table_name}(" + columns_query + ') '
+        values_query = "VALUES("
+        values.each do |value|
+            values_query += '?,'
+        end
+        values_query[values_query.length-1] = ')'
+        final_query = start_query + values_query
+        @db.execute(final_query, values)
+        return true
+    end
+
+    def self.update(hash, old_value)
+        p "hsduhasudasudhsaidhsaui"
+        result = extract_values(hash)
+        values = []
+        column = []
+        if result
+            values = result[0]
+            column = result[1]
+        else
+            return false
+        end
+
+        start_query = "UPDATE #{@table_name} "
+        update_columns_query = "SET #{column.first} = ?"
+        where_query = "WHERE #{column[0]} IS #{old_value}"
+
+        final_query = start_query + update_columns_query + where_query
+        p final_query
+        @db.execute(final_query, values)
+        return values[0]
+    end
+
+    private
+
+    def self.table_exists?
+        return @db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='#{@table_name}'")[0]
+    end
+
+    def self.extract_values(hash)
+        columns = []
         values = []
         hash.each_pair do |key,value|
             if value.is_a? Array
-                columns_query += key.to_s + ','
+                columns << key.to_s
                 result = self.valid_requirements?(value[1][:requirements], key.to_s, value.first, values)
                 if result.is_a? Array
                     values = result[1]
@@ -42,27 +97,11 @@ class BaseClass
                 end
 
             else
-                columns_query += key.to_s + ','
+                columns << key.to_s
                 values << value
             end
         end
-
-        start_query = "INSERT INTO #{@table_name}(" + columns_query[0..columns_query.length-2] + ') '
-        values_query = "VALUES("
-        values.each do |value|
-            values_query += '?,'
-        end
-        values_query[values_query.length-1] = ')'
-        final_query = start_query + values_query
-        p final_query
-        @db.execute(final_query, values)
-        return true
-    end
-
-    private
-
-    def self.table_exists?
-        return @db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='#{@table_name}'")[0]
+        return values, columns
     end
 
     #takes in a hash and joins the key and value to make a sqlite query

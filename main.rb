@@ -22,6 +22,12 @@ class Main < Sinatra::Base
         redirect user.redirectURL
     end
 
+    before '/user/:username' do
+        unless session[:logged_in] && session[:username] == params[:username]
+            redirect '/login'
+        end
+    end
+
     get '/user/:username' do
         Route.remove_old_routes(session[:username])
         @routes = Route.for_user(session[:username])
@@ -40,6 +46,12 @@ class Main < Sinatra::Base
     get '/logout' do
         session.destroy
         redirect '/'
+    end
+
+    before '/reseplanerare' do
+        unless session[:logged_in]
+            redirect '/login'
+        end
     end
 
     get '/reseplanerare' do
