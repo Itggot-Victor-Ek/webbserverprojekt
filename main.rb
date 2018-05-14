@@ -1,7 +1,22 @@
 class Main < Sinatra::Base
     enable :sessions
-    use Rack::Recaptcha, public_key: '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', private_key: '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'
-    helpers Rack::Recaptcha::Helpers
+
+    before do
+        login_paths = [/^\/user\/\S+/, '/reseplanerare']
+        login_paths.each do |path|
+            if path.match(request.path)
+                unless session[:logged_in]
+                    redirect '/login'
+                end
+                unless request.path == '/user/' + session[:username]
+                    if session[:logged_in]
+                        redirect "/user/#{session[:username]}"
+                    end
+                    redirect '/login'
+                end
+            end
+        end
+    end
 
     get '/' do
         @authorization = Authorization.new
@@ -22,12 +37,6 @@ class Main < Sinatra::Base
         redirect user.redirectURL
     end
 
-    before '/user/:username' do
-        unless session[:logged_in] && session[:username] == params[:username]
-            redirect '/login'
-        end
-    end
-
     get '/user/:username' do
         Route.remove_old_routes(session[:username])
         @routes = Route.for_user(session[:username])
@@ -46,12 +55,6 @@ class Main < Sinatra::Base
     get '/logout' do
         session.destroy
         redirect '/'
-    end
-
-    before '/reseplanerare' do
-        unless session[:logged_in]
-            redirect '/login'
-        end
     end
 
     get '/reseplanerare' do
