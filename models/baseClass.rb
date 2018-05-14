@@ -1,24 +1,37 @@
 class BaseClass
 
+    # Deletes the table which it is connected to 😥
+    #
+    # @return [nil]
     def self.delete_table()
         @db.execute("DROP TABLE #{@table_name}")
+        return nil
     end
 
+    # Stores the table name 📖
+    #
+    # @param table_name [String] takes the name as a string
+    # @return [nil]
     def self.table_name(table_name)
         @table_name = table_name
+        return nil
     end
 
-    # def self.columns(hash)
-    #     @columns = hash
-    # end
+    # Store all column names and the type it is 🌞
+    #
+    # @param hash [Hash] the column name and type eg. columnName: "type"
+    # @return [nil]
     def self.column(hash)
         @columns ||= {}
         @columns.merge!(hash)
     end
 
-    #create_table creates a table in the specified database, if the last
-    #argument is false, the database will take the first column as the primary
-    #key
+    # Creates the table and database if it doesn't exist 🙀
+    #
+    # @param db [String] the path to the database eg. '/db/db.sqlite'
+    # @param use_row_id [Boolean] if you want the databae to create a
+    #   id column or if you created one yourself
+    # @return [nil]
     def self.create_table(db, use_row_id)
 
         @db = SQLite3::Database.new(db)
@@ -28,9 +41,19 @@ class BaseClass
 
             final_query = start_query + columns_query + ")"
             @db.execute(final_query)
+            return nil
         end
+        return nil
     end
 
+    # Insert specified value/s into specified column/s with requirements 💁
+    #
+    # @param hash [Hash] the basic way follows: 'columnName: new_value'. to pass
+    #   through requirements the value of the has has to be an array where the
+    #   first element is the new value and the second element is the key
+    #   requirements: and has an array with the requirement as a symbol.
+    #   example: column: [new_value, requirements: [:unique, :no_space]]
+    # @return [Boolean] returns if the action was successfull or not
     def self.insert(hash)
         result = extract_values(hash)
         values = []
@@ -60,6 +83,12 @@ class BaseClass
         return true
     end
 
+    # Updates specified value in the specified column with requirements 📈
+    #
+    # @param hash [Hash] the basic way follows: 'columnName: new_value'. to pass
+    #   through requirements please refer to the insert method.
+    # @param old_value [String] Takes the old value you want to change
+    # @return [Boolean] returns if the action was successfull or not
     def self.update(hash, old_value)
         result = extract_values(hash)
         values = []
