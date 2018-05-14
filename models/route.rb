@@ -24,8 +24,6 @@ class Route < BaseClass
         recurring = recurring != 'true'  ? 'false' : recurring
 
         #checks if the trip already exists
-        private
-
         unless self.check_if_exists(_username, start_station, stop_station, date_and_time, _session)
 
             date = date_and_time.split(" ")[0]
@@ -139,6 +137,8 @@ class Route < BaseClass
           end
         end
     end
+
+    private
 
     def self.check_if_exists(username, start_station, stop_station, date_and_time, session)
         trips = @db.execute("SELECT * FROM #{@table_name} WHERE origin_name IS ? AND datetime(origin_time) < datetime(?)", [start_station, date_and_time])
