@@ -17,7 +17,7 @@ class Route < BaseClass
     column parent_id: 'text'
     column recurring: 'boolean'
 
-    create_table(SQLite3::Database.open('db/Västtrafik.sqlite'), false)
+    create_table('db/Västtrafik.sqlite', false)
 
     def self.add_for_user(_username, bearer_token, start_station, stop_station, date_and_time, recurring, _session)
         #This is a string since booleans crashed last time

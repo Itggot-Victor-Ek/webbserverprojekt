@@ -20,7 +20,8 @@ class BaseClass
     #argument is false, the database will take the first column as the primary
     #key
     def self.create_table(db, use_row_id)
-        @db = db
+
+        @db = SQLite3::Database.new(db)
         unless self.table_exists?
             start_query = "CREATE TABLE #{@table_name}("
             columns_query = self.join_columns(@columns, use_row_id)
