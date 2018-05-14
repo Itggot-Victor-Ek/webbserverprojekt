@@ -19,7 +19,7 @@ class Main < Sinatra::Base
     end
 
     get '/' do
-        @authorization = Authorization.new
+        @authorization = Vasttrafik_authorization.new
         session[:token] = @authorization.token
         slim :test
     end
@@ -60,7 +60,7 @@ class Main < Sinatra::Base
     get '/reseplanerare' do
         @user = session[:username]
         @stations = StationHandler.getAllStations
-        session[:token] = Authorization.new.token
+        session[:token] = Vasttrafik_authorization.new
         slim :reseplanerare
     end
 
@@ -70,7 +70,7 @@ class Main < Sinatra::Base
     end
 
     get '/token' do
-        @authorization = Authorization.new
+        @authorization = Vasttrafik_authorization.new
         session[:token] = @authorization.token
         session[:username] = 'test'
         redirect '/user/test'

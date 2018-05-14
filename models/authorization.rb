@@ -1,5 +1,4 @@
-class Authorization
-    attr_accessor :token
+class Vasttrafik_authorization
     def initialize
         consumer_key = 'VXiGD3igELfzYAQkVoJaKJXZewAa'
         consumer_secret = 'N_51VglCPlf91Oj403HHkhsNUQYa'
@@ -13,6 +12,6 @@ class Authorization
         }
         r = HTTParty.post(url, body: body, headers: headers)
         bearer_token = JSON.parse(r.body)['access_token']
-        @token = bearer_token
+        return bearer_token
       end
 end
