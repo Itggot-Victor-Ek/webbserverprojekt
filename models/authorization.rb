@@ -1,7 +1,7 @@
 class Vasttrafik_authorization
     def initialize
-        consumer_key = 'VXiGD3igELfzYAQkVoJaKJXZewAa'
-        consumer_secret = 'N_51VglCPlf91Oj403HHkhsNUQYa'
+        consumer_key = #Key here
+        consumer_secret = #Secret here
 
         credentials = Base64.encode64("#{consumer_key}:#{consumer_secret}").delete("\n")
         url = 'https://api.vasttrafik.se:443/token'
